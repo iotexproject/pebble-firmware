@@ -451,6 +451,17 @@ int iotex_mqtt_get_selected_payload(uint16_t channel, struct mqtt_payload *outpu
     {
         goto out;
     }
+    // ecc public key
+    if(get_ecc_public_key(NULL))
+    {
+        get_ecc_public_key(jsStr);
+        jsStr[128] = 0;
+        cJSON *ecc_pub_obj = cJSON_CreateString(jsStr);
+        if(!ecc_pub_obj  || json_add_obj(msg_obj, "ecc_pubkey", ecc_pub_obj))
+        {
+            goto out;
+        }        
+    }
     
     output->buf = cJSON_PrintUnformatted(msg_obj);   
     doESDA_sep256r_Sign(output->buf,strlen(output->buf),esdaSign,&sinLen);   

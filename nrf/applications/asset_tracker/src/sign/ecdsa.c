@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <zephyr.h>
 #include <mbedtls/ecdsa.h>
 #include <mbedtls/ctr_drbg.h>
@@ -7,11 +8,13 @@
 #include <sys/util.h>
 #include <toolchain/common.h>
 #include "ecdsa.h"
+#include "nvs/local_storage.h"
 
 //   do  a test or not 
 #define   TEST_ECDSA_SIGNATURE    0
 #define   ECDSA_SELF_SIGN		  0
 #define   DEBUG_ECDSA_PRINT  	  0
+#define   AES_KUM_SLOT			  2
 
 
 #define TV_NAME(name) name " -- [" __FILE__ ":" STRINGIFY(__LINE__) "]"
@@ -24,6 +27,12 @@
          } while (0)
          
 #define ECDSA_MAX_INPUT_SIZE (64)
+
+#define ECPARAMS    MBEDTLS_ECP_DP_SECP256R1
+
+#define PUBKEY_BUF_ADDRESS(a)  (a+80)
+
+#define PUBKEY_STRIP_HEAD(a)   (a+81)
 
 typedef struct {
 	const u32_t src_line_num; /**< Test vector source file line number. */
@@ -135,10 +144,10 @@ static void exec_test_case_ecdsa_sign(char *buf,int *len)
 	CHECK_RESULT(0,err_code);
 
 	/* Get public key. */
-	err_code = mbedtls_ecp_point_read_string(&ctx_sign.Q, 16,
-						 p_test_vector_sign->p_qx,
-						 p_test_vector_sign->p_qy);
-	CHECK_RESULT(0, err_code);
+//	err_code = mbedtls_ecp_point_read_string(&ctx_sign.Q, 16,
+//						 p_test_vector_sign->p_qx,
+//						 p_test_vector_sign->p_qy);
+//	CHECK_RESULT(0, err_code);
 
 	/* Get private key. */
 	err_code = mbedtls_mpi_read_string(&ctx_sign.d, 16,
@@ -146,9 +155,9 @@ static void exec_test_case_ecdsa_sign(char *buf,int *len)
 	CHECK_RESULT(0, err_code);
 
 	/* Verify keys. */
-	err_code = mbedtls_ecp_check_pubkey(&ctx_sign.grp, &ctx_sign.Q);
+//	err_code = mbedtls_ecp_check_pubkey(&ctx_sign.grp, &ctx_sign.Q);
 	//LOG_DBG("Error code pubkey check: 0x%04X", err_code);
-	CHECK_RESULT(0, err_code);
+//	CHECK_RESULT(0, err_code);
 
 	err_code = mbedtls_ecp_check_privkey(&ctx_sign.grp, &ctx_sign.d);
 	//LOG_DBG("Error code privkey check: 0x%04X", err_code);
@@ -234,6 +243,124 @@ static void exec_test_case_ecdsa_sign(char *buf,int *len)
 	mbedtls_ecdsa_free(&ctx_verify);
 #endif	
 }
+static uint16_t CRC16(uint8_t *data, size_t len) {
+	uint16_t crc = 0x0000;
+	size_t j;
+	int i;
+	for (j=len; j>0; j--) {
+		crc ^= (uint16_t)(*data++) << 8;
+		for (i=0; i<8; i++) {
+			if (crc & 0x8000) crc = (crc<<1) ^ 0x8005;
+			else crc <<= 1;
+		}
+	}
+	return (crc);
+}
+static int gen_ecc_key(char *buf, int  len, char* buf_p, int len_p)
+{
+	int ret = 0, strLen;
+	mbedtls_ecdsa_context ctx_sign;
+	mbedtls_ecdsa_init( &ctx_sign );
+    if(( ret = mbedtls_ecdsa_genkey(&ctx_sign, ECPARAMS,mbedtls_ctr_drbg_random, &ctr_drbg_ctx)) != 0)
+    {
+        printk( " failed\n  ! mbedtls_ecdsa_genkey returned %d\n", ret );
+        ret = -1;
+    }	
+	// get private key in the format of  hex-string
+	ret = mbedtls_mpi_write_string(&ctx_sign.d, 16, buf, len, &strLen);
+	if(ret){
+		printk("mbedtls_mpi_write_string erro:%d, strLen:%d\n", ret, strLen);
+		return ret;		
+	}
+	ret = mbedtls_ecp_point_write_binary( &ctx_sign.grp, &ctx_sign.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &strLen, buf_p, len_p );
+	if(ret){
+		printk("mbedtls_ecp_point_write_binary erro:%d, strLen:%d\n", ret, strLen);
+		return ret;		
+	}
+	return ret;
+}
+
+int get_ecc_key(void)
+{
+	char buf[160];
+	static uint8_t decrypted_buf[66];
+	iotex_local_storage_load(SID_ECC_KEY,buf,sizeof(buf));	
+	for(int i = 0; i <4; i++){
+		if(cc3xx_decrypt(AES_KUM_SLOT, decrypted_buf+(i<<4), buf+(i<<4))){
+			printk("cc3xx_decrypt erro\n");
+			return -1;				
+		}
+	}
+	decrypted_buf[64] = 0;
+	test_case_ecdsa_data.p_x = (const char *)decrypted_buf;
+	return  0;
+}
+/*
+pub : ecc public key, sizeof pub not less than 129 bytes
+*/
+int  get_ecc_public_key(char *pub)
+{
+	char buf[160];
+	static unsigned char trans_key = 2;
+	if(pub == NULL){
+		return  trans_key;
+	}
+	else {
+		if(trans_key > 0){
+			iotex_local_storage_load(SID_ECC_KEY,buf,sizeof(buf));	
+			hex2str(PUBKEY_STRIP_HEAD(buf), 64, pub);
+			trans_key--;
+			return 1;
+		}
+		else
+			return 0;
+	}	
+}
+
+/*
+	generate AES key, ecc key
+	buf[160] : the index of  0 ~ 79  used to store private key(hex-string),  80 ~ 179  used to store public key (binary qx,qy)
+*/
+int startup_check_ecc_key(void)
+{
+	char buf[160];	
+	uint8_t key[16];
+	uint8_t encrypted_buf[66];
+	uint16_t crc;
+	int ret,i;
+	memset(buf, 0, sizeof(buf));	
+	iotex_local_storage_load(SID_ECC_KEY,buf,sizeof(encrypted_buf));	
+	crc = *(uint16_t *)(buf+64);	
+	if((CRC16(buf, 64) != crc) || (!crc))
+	{
+		if(!gen_ecc_key(buf,sizeof(buf), PUBKEY_BUF_ADDRESS(buf), 80))
+		{	
+			mbedtls_ctr_drbg_random(&ctr_drbg_ctx, key, sizeof(key));	
+			ret = store_key_in_kmu(AES_KUM_SLOT, key);
+			if(ret)	{
+				printk("write key into kmu slot:%d erro:%d\n",AES_KUM_SLOT,ret);
+				return -1;
+			}			
+			for(i = 0; i <4; i++){
+				if(cc3xx_encrypt(AES_KUM_SLOT, buf+(i<<4), encrypted_buf+(i<<4))){
+					printk("cc3xx_encrypt erro\n");
+					return -2;						
+				}
+			}							
+			crc = CRC16(encrypted_buf, 64);			
+			*(uint16_t *)(encrypted_buf+64) = crc;
+			memcpy(buf, encrypted_buf, sizeof(encrypted_buf));				
+			iotex_local_storage_save(SID_ECC_KEY,buf, sizeof(buf));
+		}
+		else
+			return -3;
+	}
+	if(get_ecc_key())
+	{
+		return -4;
+	}
+	return  0;
+}
 
 int initECDSA_sep256r(void)
 {
@@ -243,6 +370,10 @@ int initECDSA_sep256r(void)
 		return  1;
     }   
 	initOKFlg = 1;
+	if(Initcc3xx())
+		printk("Initcc3xx error\n");
+	else
+		printk("cc3xx init ok\n");
 	return 0;
 }
 

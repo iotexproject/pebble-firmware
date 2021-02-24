@@ -883,6 +883,15 @@ void main(void)
     //  init ECDSA 
     initECDSA_sep256r();
 	 /* HAL init, notice gpio must be the first (to set IO_POWER_ON on )*/
+    iotex_local_storage_init();
+
+    if(startup_check_ecc_key())
+    {
+        printk("check ecc key error\n");
+        printk("system will not startup\n");
+        return;
+    }  
+        
 	iotex_hal_gpio_init();
 	iotex_hal_adc_init();	
     /* Iotex Init BME680 */
@@ -916,7 +925,7 @@ for(int i=0; i< 30; i++)
 	work_init();
 	modem_configure();
 	iotex_modem_get_clock(NULL);
-	iotex_local_storage_init();
+	
 
 #if defined(CONFIG_LWM2M_CARRIER)
 	k_sem_take(&bsdlib_initialized, K_FOREVER);

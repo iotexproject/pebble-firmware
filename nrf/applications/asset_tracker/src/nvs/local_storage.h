@@ -25,6 +25,7 @@ typedef enum {
 
     /* MQTT configure sid */
     SID_MQTT_DATA_CHANNEL_CONFIG = 0x1001,
+	SID_ECC_KEY = 0x1002,
 } iotex_storage_id;
 
 
