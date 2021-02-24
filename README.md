@@ -38,9 +38,13 @@ The firmware implements the asset tracking application using Pebble hardware des
 
 # update
 . Add a new board: iotex_pebble_hw20, select board name iotex_pebble_hw20ns in NS mode
+
 . Autom generate AES key then write into kmu slot
+
 . Automatically generate ECC key pair, store it in Flash after encryption
+
 . After the pebble is powered on, the ECC public key will be sent to the thigsboard
+
 
 #  [FOTA(firmware over-the-air)](https://github.com/iotexproject/pebble-firmware/tree/v1.4.0/nrf/samples/nrf9160/http_application_update)
 
