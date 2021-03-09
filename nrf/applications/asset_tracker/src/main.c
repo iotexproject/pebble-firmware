@@ -881,7 +881,21 @@ void main(void)
 		watchdog_init_and_start(&application_work_q);
 	}
     //  init ECDSA 
-    initECDSA_sep256r();
+    if(initECDSA_sep256r())
+    {
+        printk("initECDSA_sep256r error\n");       
+        return;        
+    }
+    //Initcc3xx();
+    //store_key_in_kmu(2);
+    //use_key_from_kmu(2);
+
+    //return 0;
+
+    //RSA_gen_key();
+    //RSA_encrypt();
+    //RSA_decrypt();
+
 	 /* HAL init, notice gpio must be the first (to set IO_POWER_ON on )*/
     iotex_local_storage_init();
 

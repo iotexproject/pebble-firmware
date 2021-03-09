@@ -47,4 +47,4 @@ spm:
   inside: [mcuboot_primary_app]
   placement:
     before: [app]
-  size: 0xc000
+  size: 0x18000

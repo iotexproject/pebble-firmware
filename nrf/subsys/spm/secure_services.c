@@ -12,6 +12,14 @@
 #include <string.h>
 #include <bl_validation.h>
 
+#include <sys/printk.h>
+#include "nrf_cc3xx_platform.h"
+#include "nrf_cc3xx_platform_kmu.h"
+#include "mbedtls/cc3xx_kmu.h"
+#include "mbedtls/aes.h"
+#include "mbedtls/ctr_drbg.h"
+
+
 #if USE_PARTITION_MANAGER
 #include <pm_config.h>
 #endif
@@ -168,3 +176,101 @@ void spm_busy_wait_nse(uint32_t busy_wait_us)
 	k_busy_wait(busy_wait_us);
 }
 #endif /* CONFIG_SPM_SERVICE_BUSY_WAIT */
+
+__TZ_NONSECURE_ENTRY_FUNC
+int store_key_in_kmu(uint32_t slot_id, char *key, char *read)
+{
+	int ret;
+	if(slot_id >=2) {
+		ret = nrf_cc3xx_platform_kmu_write_key_slot(
+			slot_id,
+			NRF_CC3XX_PLATFORM_KMU_AES_ADDR,
+			NRF_CC3XX_PLATFORM_KMU_DEFAULT_PERMISSIONS,
+			key);
+		if((ret != NRF_CC3XX_PLATFORM_SUCCESS) && (ret != NRF_CC3XX_PLATFORM_ERROR_KMU_ALREADY_FILLED))
+		{
+			//printk("Could not write KMU slot %i. Try erasing the board...\n", slot_id);
+			return ret;
+		}
+	}
+	else
+	{
+		/*
+		*(int *)(0x50039000 + 0x500) = slot_id + 1;
+		ret = *(int *)(0x00FF8800+ slot_id * 0x10+ 0 * 0x4);
+		read[0] = ret&0x000000FF;
+		read[1] = (ret&0x0000FF00)>>8;
+		read[2] = (ret&0x00FF0000)>>16;
+		read[3] = (ret&0xFF000000)>>24;
+
+		*(int *)(0x50039000 + 0x500) = 0;
+		*/
+		ret = nrf_cc3xx_platform_kmu_write_kdr_slot(key);
+		if((ret != NRF_CC3XX_PLATFORM_SUCCESS) && (ret != NRF_CC3XX_PLATFORM_ERROR_KMU_ALREADY_FILLED))
+		{
+			//printk("Could not write KMU slot %i. Try erasing the board...\n", slot_id);
+			return ret;
+		}
+		ret = nrf_cc3xx_platform_kmu_push_kdr_slot_and_lock();
+		if(ret != NRF_CC3XX_PLATFORM_SUCCESS)
+			return ret;
+	}
+	return 0;
+}
+__TZ_NONSECURE_ENTRY_FUNC
+int Initcc3xx(void)
+{
+	if (nrf_cc3xx_platform_init() != 0)
+	{
+		//printk("Failed to initialize CC3xx platform.\n");
+		return -1;
+	}
+	return 0;	
+}
+__TZ_NONSECURE_ENTRY_FUNC
+int cc3xx_encrypt(uint32_t slot_id, char *plain_text,  char *cipher_text)
+{
+	int ret;
+	mbedtls_aes_context ctx = {0};
+	mbedtls_aes_init(&ctx);	
+	char *label = "Sealing Key";
+	char *contex = "";	
+	// Set to use direct shadow key for encryption.
+	if(slot_id >=2) {
+		ret = mbedtls_aes_setkey_enc_shadow_key(&ctx, slot_id, 128);
+	}	
+	else{
+		ret = mbedtls_aes_setkey_enc_shadow_key_derived(&ctx, slot_id, 128, label, strlen(label), contex, strlen(contex));
+	}	
+	if (ret != 0)
+	{		
+		return ret;
+	}	
+	
+	mbedtls_aes_encrypt(&ctx, plain_text, cipher_text);	
+	return 0;
+}
+__TZ_NONSECURE_ENTRY_FUNC
+int  cc3xx_decrypt(uint32_t slot_id, char *plain_text_decrypted,  char *cipher_text)
+{
+    int ret;
+	char *label = "Sealing Key";
+	char *contex = "";
+
+	mbedtls_aes_context ctx = {0};
+	mbedtls_aes_init(&ctx);
+	// Set to use direct shadow key for decryption.
+	if(slot_id >=2) {	
+		ret = mbedtls_aes_setkey_dec_shadow_key(&ctx, slot_id, 128);
+	}
+	else {
+		ret = mbedtls_aes_setkey_dec_shadow_key_derived(&ctx, slot_id, 128, label, strlen(label), contex, strlen(contex));
+	}		
+	if (ret != 0)
+	{		
+		return ret;
+	}
+
+	mbedtls_aes_decrypt(&ctx, cipher_text, plain_text_decrypted);
+	return 0;	
+}
