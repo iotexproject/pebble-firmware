@@ -5,11 +5,9 @@ The firmware implements the asset tracking application using Pebble hardware des
 
 # download v1.4.0
 
-. git clone -b v1.4.0 https://github.com/iotexproject/pebble-firmware-legacy
+. git clone -b v1.4.0   https://github.com/iotexproject/pebble-firmware.git
 
 . cd  pebble-firmware
-
-. git clone -b toolchain   https://github.com/iotexproject/pebble-firmware-legacy
 
 . git clone -b v2.4.0-ncs1  https://github.com/nrfconnect/sdk-zephyr  zephyr
 
@@ -39,4 +37,4 @@ The firmware implements the asset tracking application using Pebble hardware des
 6.   Recompile the firmware, the new firmware will be signed with the new key and verified at startup
 
 
-   
+
