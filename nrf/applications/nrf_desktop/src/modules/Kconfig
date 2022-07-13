@@ -1,0 +1,26 @@
+#
+# Copyright (c) 2018 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+rsource "Kconfig.hid"
+rsource "Kconfig.smp"
+rsource "Kconfig.power_manager"
+rsource "Kconfig.hid_state"
+rsource "Kconfig.led_state"
+rsource "Kconfig.led_stream"
+rsource "Kconfig.usb_state"
+rsource "Kconfig.ble"
+rsource "Kconfig.hids"
+rsource "Kconfig.hid_forward"
+rsource "Kconfig.bas"
+rsource "Kconfig.qos"
+rsource "Kconfig.config_channel"
+rsource "Kconfig.fn_keys"
+rsource "Kconfig.watchdog"
+rsource "Kconfig.settings_loader"
+rsource "Kconfig.hotfixes"
+rsource "Kconfig.failsafe"
+rsource "Kconfig.cpu_meas"
+rsource "Kconfig.profiler_sync"

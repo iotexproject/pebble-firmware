@@ -1,0 +1,3 @@
+tests:
+  unity.example_test:
+    tags: example

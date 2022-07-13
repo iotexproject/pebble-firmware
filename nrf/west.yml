@@ -1,0 +1,134 @@
+# The west manifest file (west.yml) for the nRF Connect SDK (NCS).
+#
+# The per-workspace west configuration file, ncs/.west/config,
+# specifies the location of this manifest file like this:
+#
+#     [manifest]
+#     path = nrf
+#
+# See the west documentation for more information:
+#
+# https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/west/index.html
+
+manifest:
+  # This west.yml requires west 0.7 or later, because the "import"
+  # feature used below was introduced then.
+  version: 0.7
+
+  # "remotes" is a list of locations where git repositories are cloned
+  # and fetched from.
+  remotes:
+    # nRF Connect SDK GitHub organization.
+    # NCS repositories are hosted here.
+    - name: ncs
+      url-base: https://github.com/nrfconnect
+    # Third-party repository sources:
+    - name: zephyrproject
+      url-base: https://github.com/zephyrproject-rtos
+    - name: throwtheswitch
+      url-base: https://github.com/ThrowTheSwitch
+    - name: armmbed
+      url-base: https://github.com/ARMmbed
+    - name: nanopb
+      url-base: https://github.com/nanopb
+    - name: alexa
+      url-base: https://github.com/alexa
+
+  # If not otherwise specified, the projects below should be obtained
+  # from the ncs remote.
+  defaults:
+    remote: ncs
+
+  # "projects" is a list of git repositories which make up the NCS
+  # source code.
+  projects:
+
+    # The Zephyr RTOS fork in the NCS, along with the subset of its
+    # modules which NCS imports directly.
+    #
+    # https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/introduction/index.html
+    # https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/modules.html
+    - name: zephyr
+      repo-path: sdk-zephyr
+      revision: v2.4.0-ncs1
+      import:
+        # In addition to the zephyr repository itself, NCS also
+        # imports the contents of zephyr/west.yml at the above
+        # revision. Only the projects explicitly named in the
+        # following whitelist are imported.
+        #
+        # Note that the zephyr west extensions (like 'build', 'flash',
+        # 'debug', etc.) are automatically provided by this import, so
+        # there's no need to add a redundant west-commands: key for
+        # the zephyr project.
+        #
+        # Please keep this list sorted alphabetically.
+        name-whitelist:
+          - canopennode
+          - ci-tools
+          - cmsis
+          - civetweb
+          - edtt
+          - fatfs
+          - hal_nordic
+          - hal_st
+          - libmetal
+          - littlefs
+          - loramac-node
+          - lvgl
+          - mbedtls
+          - mipi-sys-t
+          - net-tools
+          - nrf_hw_models
+          - open-amp
+          - openthread
+          - segger
+          - tinycbor
+          - tinycrypt
+
+    # NCS repositories.
+    #
+    # Some of these are also Zephyr modules which have NCS-specific
+    # changes.
+    - name: mcuboot
+      repo-path: sdk-mcuboot
+      revision: v1.6.99-ncs1
+      path: bootloader/mcuboot
+    - name: mcumgr
+      repo-path: sdk-mcumgr
+      revision: v0.1.0-ncs1
+      path: modules/lib/mcumgr
+    - name: nrfxlib
+      repo-path: sdk-nrfxlib
+      path: nrfxlib
+      revision: v1.4.0
+    # Other third-party repositories.
+    - name: cmock
+      path: test/cmock
+      revision: c243b9a7a7b3c471023193992b46cf1bd1910450
+      remote: throwtheswitch
+    - name: unity
+      path: test/cmock/vendor/unity
+      revision: 031f3bbe45f8adf504ca3d13e6f093869920b091
+      remote: throwtheswitch
+    - name: mbedtls-nrf
+      path: mbedtls
+      repo-path: mbedtls
+      revision: mbedtls-2.23.0
+      remote: armmbed
+    - name: nanopb
+      path: modules/lib/nanopb
+      revision: nanopb-0.4.2
+      remote: nanopb
+    - name: Alexa-Gadgets-Embedded-Sample-Code
+      path: modules/alexa-embedded
+      revision: face92d8c62184832793f518bb1f19379538c5c1
+      remote: alexa
+
+  # West-related configuration for the nrf repository.
+  self:
+    # This repository should be cloned to ncs/nrf.
+    path: nrf
+    # This line configures west extensions which are currently only
+    # for internal use by NCS maintainers.
+    west-commands: scripts/west-commands.yml

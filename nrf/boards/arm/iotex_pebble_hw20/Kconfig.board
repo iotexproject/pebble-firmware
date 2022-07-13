@@ -1,0 +1,15 @@
+# Thingy:91 nRF9160 board configuration
+#
+# Copyright (c) 2019 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+
+if SOC_NRF9160_SICA
+
+config BOARD_THINGY91_NRF9160
+	bool "nRF9160 THINGY91"
+
+config BOARD_THINGY91_NRF9160NS
+	bool "nRF9160 THINGY91 non-secure"
+
+endif # SOC_NRF9160_SICA

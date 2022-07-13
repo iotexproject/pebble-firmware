@@ -1,0 +1,71 @@
+# Thingy:91 nRF9160 board configuration
+#
+# Copyright (c) 2018 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+
+if BOARD_THINGY91_NRF9160 || BOARD_THINGY91_NRF9160NS
+
+config BOARD
+	default "iotex_pebble_hw20"
+
+if ADC
+
+config ADC_0
+	bool
+	default y
+
+endif # ADC
+
+if I2C
+
+config I2C_2
+	bool
+	default y
+
+endif # I2C
+
+if PWM
+
+config PWM_0
+	bool
+	default y
+
+endif # PWM
+
+if SPI
+
+config SPI_3
+	bool
+	default y
+
+endif # SPI
+
+# For the secure version of the board the firmware is linked at the beginning
+# of the flash, or into the code-partition defined in DT if it is intended to
+# be loaded by MCUboot. If the secure firmware is to be combined with a non-
+# secure image (TRUSTED_EXECUTION_SECURE=y), the secure FW image shall always
+# be restricted to the size of its code partition.
+# For the non-secure version of the board, the firmware
+# must be linked into the code-partition (non-secure) defined in DT, regardless.
+# Apply this configuration below by setting the Kconfig symbols used by
+# the linker according to the information extracted from DT partitions.
+
+if BOARD_THINGY91_NRF9160 && TRUSTED_EXECUTION_SECURE
+
+config FLASH_LOAD_SIZE
+	default $(dt_chosen_reg_size_hex,$(DT_CHOSEN_Z_CODE_PARTITION))
+
+endif # BOARD_THINGY91_NRF9160 && TRUSTED_EXECUTION_SECURE
+
+if BOARD_THINGY91_NRF9160NS
+
+config FLASH_LOAD_OFFSET
+	default $(dt_chosen_reg_addr_hex,$(DT_CHOSEN_Z_CODE_PARTITION))
+
+config FLASH_LOAD_SIZE
+	default $(dt_chosen_reg_size_hex,$(DT_CHOSEN_Z_CODE_PARTITION))
+
+endif # BOARD_THINGY91_NRF9160NS
+
+endif # BOARD_THINGY91_NRF9160 || BOARD_THINGY91_NRF9160NS

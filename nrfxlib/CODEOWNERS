@@ -1,0 +1,33 @@
+# CODEOWNERS for autoreview assigning in github
+
+# Order is important; the last matching pattern takes the most
+# precedence.
+
+# Root folder
+/CODEOWNERS                               @carlescufi
+/LICENSE                                  @carlescufi
+/Jenkinsfile                              @thst-nordic
+/README.rst                               @ru-fu @carlescufi
+
+# All cmake related files
+/CMakeLists.txt                           @tejlmand
+
+# All Kconfig related files
+Kconfig*                                  @tejlmand
+
+# All documentation related files
+*.rst                                     @b-gent
+doc/*                                     @b-gent
+
+# All subfolders
+/.github/                                 @thst-nordic
+/softdevice_controller/                   @joerchan @rugeGerritsen
+/bsdlib/                                  @rlubos @lemrey @evenl
+/crypto/                                  @frkv @tejlmand
+/mpsl/                                    @joerchan @rugeGerritsen
+/nfc/                                     @anangl @grochu
+/nrf_security/                            @frkv @tejlmand
+/openthread/                              @MarekPorwisz @lmaciejonczyk
+/zboss/                                   @tomchy
+/zephyr/                                  @carlescufi
+/nrf_rpc/                                 @doki-nordic @KAGA164

@@ -1,0 +1,12 @@
+identifier: thingy91_nrf52840
+name: Thingy91-NRF52840
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+supported:
+  - adc
+  - usb_device
+  - ble
+  - ieee802154

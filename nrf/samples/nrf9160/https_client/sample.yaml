@@ -1,0 +1,8 @@
+sample:
+  name: HTTPS client sample
+tests:
+  samples.nrf9160.https_client:
+    build_only: true
+    build_on_all: true
+    platform_allow: nrf9160dk_nrf9160ns
+    tags: ci_build

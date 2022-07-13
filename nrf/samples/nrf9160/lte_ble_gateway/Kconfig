@@ -1,0 +1,50 @@
+#
+# Copyright (c) 2018 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+menu "LTE BLE gateway sample"
+
+choice
+	prompt "GPS device"
+	default GPS_USE_SIM
+	help
+		Select from which device GPS data will be fetched.
+
+config GPS_USE_SIM
+	bool "Use GPS simulator"
+	select GPS_SIM
+	select GPS_SIM_TRIGGER
+	help
+		Use simulated GPS data.
+
+config GPS_USE_NRF9160
+	bool "User provided GPS device"
+	help
+		Provide a GPS device that location data will be fetched from and
+		sent to nRF Cloud
+
+endchoice
+
+config GPS_DEV_NAME
+	string
+	default GPS_SIM_DEV_NAME if GPS_USE_SIM
+	default "NRF9160_GPS" if GPS_USE_NRF9160
+
+config GPS_SEARCH_INTERVAL
+	int "Interval for starting GPS search"
+	default 240
+
+config GPS_SEARCH_TIMEOUT
+	int "Timeout for GPS search"
+	default 120
+	help
+	  The GPS will stop acquiring GPS fix when it times out.
+	  It will restart the search at the start of the next search interval.
+
+endmenu
+
+menu "Zephyr Kernel"
+source "Kconfig.zephyr"
+endmenu

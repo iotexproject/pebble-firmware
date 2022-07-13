@@ -1,0 +1,32 @@
+#
+# Copyright (c) 2019 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+menu "Unittest"
+
+config UNITTEST
+	bool "Enable Unittest"
+
+config NVS_UNITTEST
+	bool "Test NVS Local storage"
+	depends on UNITTEST
+	default n
+
+config NANOPB_UNITTEST
+	bool "Test nanopb protobuf encode/decode"
+	depends on UNITTEST
+	default n
+
+config MQTT_UNITTEST
+	bool "Test MQTT"
+	depends on UNITTEST
+	default n
+
+module = UNITTEST
+module-str = Unittest
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endmenu
+

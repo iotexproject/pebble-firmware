@@ -1,0 +1,4 @@
+tests:
+  net.lib.aws_jobs:
+    platform_allow: native_posix
+    tags: aws

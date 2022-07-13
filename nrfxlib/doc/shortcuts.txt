@@ -1,0 +1,10 @@
+.. |NCS| replace:: nRF Connect SDK
+
+.. |BLE| replace:: Bluetooth LE
+
+.. |controller| replace:: SoftDevice Controller
+
+.. |nRF52840DK| replace:: nRF52840 DK board (PCA10056)
+.. |nRF52833DK| replace:: nRF52833 DK board (PCA10100)
+.. |nRF52820DK| replace:: nRF52820 DK board (PCA10100)
+.. |nRF52811DK| replace:: nRF52811 DK board (PCA10100)

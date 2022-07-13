@@ -1,0 +1,34 @@
+#
+# Copyright (c) 2018 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+config NCS_SAMPLES_DEFAULTS
+	bool "Enable NCS sample default settings"
+	default n
+	imply LOG
+	imply LOG_MINIMAL
+	imply ASSERT
+	imply HW_STACK_PROTECTION if ARCH_HAS_STACK_PROTECTION
+	help
+	  Use the default configuration for NCS samples.
+
+config NCS_SAMPLE_EMPTY_APP_CORE_CHILD_IMAGE
+	bool "Enable empty_app_core as a child image"
+	default n
+	depends on SOC_NRF5340_CPUNET
+	help
+	  Add the empty_app_core as a child image for the given sample.
+	  Used by samples that only require SOC_NRF5340_CPUNET.
+
+if LOG
+
+# LOG_DEFAULT_LEVEL is declared in Zephyr,
+# we declare it here for a second time, to set a different default.
+# Omit the `prompt` to prevent it from appearing twice in two diffent places.
+
+config LOG_DEFAULT_LEVEL
+	default 1 if NCS_SAMPLES_DEFAULTS
+
+endif # LOG

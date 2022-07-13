@@ -1,0 +1,62 @@
+#
+# Copyright (c) 2018 Nordic Semiconductor
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+zephyr_library()
+
+zephyr_library_sources(model_utils.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_ONOFF_SRV gen_onoff_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_ONOFF_CLI gen_onoff_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LVL_SRV gen_lvl_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LVL_CLI gen_lvl_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_DTT_SRV gen_dtt_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_DTT_CLI gen_dtt_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_PONOFF_SRV gen_ponoff_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_PONOFF_CLI gen_ponoff_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_PLVL_SRV gen_plvl_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_PLVL_CLI gen_plvl_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_BATTERY_SRV gen_battery_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_BATTERY_CLI gen_battery_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LOC_SRV gen_loc_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LOC_CLI gen_loc_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_PROP_SRV gen_prop_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_PROP_CLI gen_prop_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LIGHTNESS_SRV lightness_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LIGHTNESS_CLI lightness_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LIGHT_CTRL_SRV light_ctrl_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LIGHT_CTRL_CLI light_ctrl_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_DK_PROV dk_prov.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_SENSOR_SRV sensor_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_SENSOR_CLI sensor_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_SENSOR sensor_types.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_SENSOR sensor.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_TIME_SRV time_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_TIME_CLI time_cli.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_TIME time.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_TIME time_util.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LIGHT_CTL_CLI light_ctl_cli.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LIGHT_TEMP_SRV light_temp_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_LIGHT_CTL_SRV light_ctl_srv.c)
+
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_SCENE_SRV scene_srv.c)
+zephyr_library_sources_ifdef(CONFIG_BT_MESH_SCENE_CLI scene_cli.c)
+
+zephyr_linker_sources(SECTIONS sensor_types.ld)

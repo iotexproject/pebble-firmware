@@ -1,0 +1,42 @@
+#
+# Copyright (c) 2019 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+menu "MQTT_CONFIG"
+
+config DEBUG_MQTT_CONFIG
+	bool "Enable MQTT Configure Debug"
+	default n
+
+config MQTT_CONFIG_BULK_UPLOAD
+	bool "Enable bulk upload"
+	default n
+
+config MQTT_CONFIG_DATA_CHANNEL
+	hex "Sampling data channel"
+	default 0x1ff7
+
+config MQTT_CONFIG_UPLOAD_PERIOD
+	int "Data upload period"
+	depends on !MQTT_CONFIG_BULK_UPLOAD
+	default 30
+
+config MQTT_CONFIG_SAMPLING_COUNT
+	int "Bulk upload sampling count"
+	depends on MQTT_CONFIG_BULK_UPLOAD
+	default 100
+
+config MQTT_CONFIG_SAMPLING_FREQUENCY
+	int "Bulk upload sampling frequency"
+	depends on MQTT_CONFIG_BULK_UPLOAD
+	default 10
+
+
+module = MQTT_CONFIG
+module-str = MQTT_CONFIG
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endmenu
+

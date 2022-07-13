@@ -1,0 +1,24 @@
+#
+# Copyright (c) 2019 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+menu "IOTEX  HTTP application update"
+
+config DOWNLOAD_HOST
+	string "Download host name"
+
+config DOWNLOAD_FILE
+	string "The file to download"
+
+config APPLICATION_VERSION
+	int "Application version"
+	default 1
+
+config USE_HTTPS
+	bool
+	prompt "Use HTTPS for download"
+
+endmenu
+

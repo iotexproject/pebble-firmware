@@ -1,0 +1,228 @@
+/*
+ * Copyright (c) 2019 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+ */
+
+/ {
+	model = "Nordic Thingy91 nRF9160";
+	compatible = "nordic,thingy91-nrf9160";
+
+	chosen {
+		zephyr,console = &uart0;
+		zephyr,shell-uart = &uart0;
+		zephyr,uart-mcumgr = &uart0;
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+
+		button0: button_0 {
+			gpios = <&gpio0 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			label = "Button 1";
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		red_led: led_1 {
+			gpios = <&gpio0 16 0>;
+			label = "RGB red channel";
+		};
+		green_led: led_2 {
+			gpios = <&gpio0 18 0>;
+			label = "RGB green channel";
+		};
+		blue_led: led_3 {
+			gpios = <&gpio0 17 0>;
+			label = "RGB blue channel";
+		};
+		sense_red_led: led_4 {
+			gpios = <&gpio0 10 0>;
+			label = "RGB red channel";
+		};
+		sense_green_led: led_5 {
+			gpios = <&gpio0 11 0>;
+			label = "RGB green channel";
+		};
+		sense_blue_led: led_6 {
+			gpios = <&gpio0 12 0>;
+			label = "RGB blue channel";
+		};
+	};
+
+	aliases {
+		sw0 = &button0;
+		led0 = &red_led;
+		led1 = &green_led;
+		led2 = &blue_led;
+		sense-led0 = &sense_red_led;
+		sense-led1 = &sense_green_led;
+		sense-led2 = &sense_blue_led;
+		rgb-pwm = &pwm0;
+		buzzer-pwm = &pwm1;
+		nmos-pwm = &pwm2;
+	};
+};
+
+&adc {
+	status = "okay";
+};
+
+&gpiote {
+	status = "okay";
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+/* PWM0 is intended for RGB LED control */
+&pwm0 {
+	status = "okay";
+	ch0-pin = <16>;
+	ch1-pin = <17>;
+	ch2-pin = <18>;
+};
+
+/* PWM1 is intended for buzzer control */
+&pwm1 {
+	status = "okay";
+	ch0-pin = <26>;
+};
+
+/* PWM2 is intended for NMOS transistor control */
+&pwm2 {
+	status = "okay";
+};
+
+&pwm3 {
+	status = "okay";
+};
+&i2c1 {
+	compatible = "nordic,nrf-twim";
+	status = "disabled";
+	sda-pin = <27>;
+	scl-pin = <28>;
+};
+
+&i2c2{
+	compatible = "nordic,nrf-twim";
+	status = "okay";
+	sda-pin = <23>;
+	scl-pin = <22>;
+                clock-frequency = <I2C_BITRATE_FAST>;
+
+};
+
+&i2c3 {
+	compatible = "nordic,nrf-twim";
+	status = "disabled";
+	sda-pin = <14>;
+	scl-pin = <20>;
+	clock-frequency = <I2C_BITRATE_FAST>;
+};
+&spi3 {
+	compatible = "nordic,nrf-spim";
+	status = "disabled";
+};
+
+&timer0 {
+	status = "okay";
+};
+
+&timer1 {
+	status = "okay";
+};
+
+&timer2 {
+	status = "okay";
+};
+
+&uart0 {
+	compatible = "nordic,nrf-uarte";
+	current-speed = <115200>;
+	status = "okay";
+	tx-pin = <30>;
+	rx-pin = <29>;
+	rts-pin = <31>;
+	cts-pin = <00>;
+};
+
+&uart1 {
+	current-speed = <1000000>;
+	status = "okay";
+	tx-pin = <02>;
+	rx-pin = <01>;
+	rts-pin = <03>;
+	cts-pin = <04>;
+};
+
+&uart3 {
+	current-speed = <115200>;
+	status = "okay";
+	tx-pin = <8>;
+	rx-pin = <9>;
+};
+
+
+&flash0 {
+	/*
+	 * For more information, see:
+	 * http://docs.zephyrproject.org/devices/dts/flash_partitions.html
+	 */
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x10000>;
+		};
+		slot0_partition: partition@10000 {
+			label = "image-0";
+		};
+		slot0_ns_partition: partition@40000 {
+			label = "image-0-nonsecure";
+		};
+		slot1_partition: partition@80000 {
+			label = "image-1";
+		};
+		slot1_ns_partition: partition@b0000 {
+			label = "image-1-nonsecure";
+		};
+		scratch_partition: partition@f0000 {
+			label = "image-scratch";
+			reg = <0x000f0000 0xa000>;
+		};
+		storage_partition: partition@fa000 {
+			label = "storage";
+			reg = <0x000fa000 0x00006000>;
+		};
+	};
+};
+
+/ {
+
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		sram0_s: image_s@20000000 {
+			/* Secure image memory */
+		};
+
+		sram0_bsd: image_bsd@20010000 {
+			/* BSD (shared) memory */
+		};
+
+		sram0_ns: image_ns@20020000 {
+			/* Non-Secure image memory */
+		};
+	};
+};
+
+/* Include partition configuration file */
+#include "iotex_pebble_hw30_partition_conf.dts"

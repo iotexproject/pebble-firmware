@@ -1,0 +1,26 @@
+#
+# Copyright (c) 2019 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+menuconfig FOTA_DOWNLOAD
+	bool "FOTA Download"
+	depends on DOWNLOAD_CLIENT
+	depends on DFU_TARGET
+
+if (FOTA_DOWNLOAD)
+
+config FOTA_SOCKET_RETRIES
+	int "Number of retries for socket-related download issues"
+	default 2
+
+config FOTA_DOWNLOAD_PROGRESS_EVT
+	bool "Emit progress event upon receiving a download fragment"
+
+module=FOTA_DOWNLOAD
+module-dep=LOG
+module-str=Firmware Over the Air Download
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endif # FOTA_DOWNLOAD

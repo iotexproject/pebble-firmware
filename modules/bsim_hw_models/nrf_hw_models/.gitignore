@@ -1,0 +1,7 @@
+*.a
+*.d
+*.o
+*.so
+*~
+.*project
+.settings/

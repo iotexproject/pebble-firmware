@@ -1,0 +1,32 @@
+#
+# Copyright (c) 2019 - 2020 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+menu "Nordic MPSL"
+
+config MPSL_THREAD_COOP_PRIO
+	int
+	default 0 if NET_L2_OPENTHREAD
+	default SDC_RX_PRIO if BT_LL_SOFTDEVICE
+	default 8
+
+config MPSL_SIGNAL_STACK_SIZE
+	int "Size of the signal handler thread stack"
+	default 1024
+	help
+	  Size of the signal handler thread stack, used to process lower
+	  priority signals in MPSL.
+
+config MPSL_TIMESLOT_SESSION_COUNT
+	int "Number of timeslot sessions"
+	default 0
+	help
+	  Maximum number of timeslot sessions.
+
+module=MPSL
+module-str=MPSL
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+endmenu

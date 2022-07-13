@@ -1,0 +1,32 @@
+#
+# Copyright (c) 2019 Nordic Semiconductor ASA
+#
+# SPDX-License-Identifier: LicenseRef-BSD-5-Clause-Nordic
+#
+
+config FPROTECT
+	bool "Write-protect flash regions"
+	depends on SOC_FAMILY_NRF
+	help
+	  Use hardware peripherals (BPROT, ACL, or SPU) to write-protect
+	  regions of flash until next reset.
+
+
+if !ARM
+config NRF_SPU_FLASH_REGION_SIZE
+	hex
+	default 0x1000
+	help
+	  Redefinition for the benefit of qemu_x86
+endif
+
+# Workaround for not being able to have commas in macro arguments
+DT_ZEPHYR_FLASH := zephyr,flash
+DT_CHOSEN_ZEPHYR_FLASH := $(dt_chosen_path,$(DT_ZEPHYR_FLASH))
+
+config FPROTECT_BLOCK_SIZE
+	hex
+	default NRF_SPU_FLASH_REGION_SIZE if SOC_NRF9160 || SOC_NRF5340_CPUAPP
+	default $(dt_node_int_prop_hex,$(DT_CHOSEN_ZEPHYR_FLASH),erase-block-size)
+	help
+	  Block size of fprotect
