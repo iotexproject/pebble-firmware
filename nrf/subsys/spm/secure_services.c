@@ -250,7 +250,7 @@ int cc3xx_encrypt(uint32_t slot_id, char *plain_text,  char *cipher_text)
 	mbedtls_aes_encrypt(&ctx, plain_text, cipher_text);	
 	return 0;
 }
-__TZ_NONSECURE_ENTRY_FUNC
+
 int  cc3xx_decrypt(uint32_t slot_id, char *plain_text_decrypted,  char *cipher_text)
 {
     int ret;

@@ -26,6 +26,17 @@
 
 #define	   TEST_VERFY_SIGNATURE	
 
+#define      PRIV_STR_BUF_SIZE        133
+#define   PRIV_STR_LEN           (PRIV_STR_BUF_SIZE-1)
+#define   PUB_STR_BUF_SIZE        197
+#define  KEY_HEX_SIZE        184
+#define  PRIV_HEX_SIZE        66
+#define  PUB_HEX_SIZE        (KEY_HEX_SIZE - PRIV_HEX_SIZE)
+#define  PUB_HEX_ADDR(a)    (a+PRIV_HEX_SIZE)
+#define  PUB_STR_ADDR(a)    (a+PRIV_STR_LEN)
+#define  COM_PUB_STR_ADD(a)  (a+PRIV_STR_LEN+130)
+#define  UNCOM_PUB_STR_ADD(a) (a+PRIV_STR_LEN)
+
 #define TV_NAME(name) name " -- [" __FILE__ ":" STRINGIFY(__LINE__) "]"
 
 typedef struct {
@@ -300,6 +311,32 @@ void hex2str(char* buf_hex, int len, char *str)
 	}
 	str[j] = 0;	
 }
+static char str2Hex(char c)
+{
+    if (c >= '0' && c <= '9') {
+        return (c - '0');
+    }
+
+    if (c >= 'a' && c <= 'z') {
+        return (c - 'a' + 10);
+    }
+
+    if (c >= 'A' && c <= 'Z') {
+        return (c -'A' + 10);
+    }
+    return c;
+}
+
+int hexStr2Bin(char *str, char *bin) {
+    int i,j;
+    for(i = 0,j = 0; j < (strlen(str)>>1) ; i++,j++)
+    {
+        bin[j] = (str2Hex(str[i]) <<4);
+        i++;
+        bin[j] |= str2Hex(str[i]);
+    }
+    return j; 
+}
 
 __TZ_NONSECURE_ENTRY_FUNC
 int GenRandom(char *out)
@@ -352,7 +389,6 @@ int gen_ecc_key(char *buf, int  *len, char* buf_p, int *len_p)
 	return ret;
 }
 
-__TZ_NONSECURE_ENTRY_FUNC
 #ifdef TEST_VERFY_SIGNATURE
 void SetEccPrivKey(uint8_t *key, uint8_t *key_p)
 #else
@@ -384,5 +420,33 @@ __TZ_NONSECURE_ENTRY_FUNC
 void genAESKey(uint8_t *key, int len)
 {
     drbg_random(&ctr_drbg_ctx, key, sizeof(key));
+}
+
+__TZ_NONSECURE_ENTRY_FUNC
+int  updateKey(uint8_t *key)
+{
+    uint8_t decrypted_buf[PRIV_STR_BUF_SIZE];
+    uint8_t binBuf[PRIV_STR_BUF_SIZE];
+    unsigned char pub[PUB_STR_BUF_SIZE];
+
+	memcpy(decrypted_buf, key, PRIV_STR_LEN);
+	decrypted_buf[PRIV_STR_LEN] = 0;
+	hexStr2Bin(decrypted_buf, binBuf);
+	for (int i = 0; i < 4; i++) {
+		if (cc3xx_decrypt(AES_KMU_SLOT, decrypted_buf+(i<<4), binBuf+(i<<4))) {
+			return -1;
+		}
+	}
+	decrypted_buf[64] = 0;
+#ifdef TEST_VERFY_SIGNATURE    
+	memcpy(pub, UNCOM_PUB_STR_ADD(key)+2, 128);
+	pub[128] = 0;
+	SetEccPrivKey(decrypted_buf, pub);
+#else
+	memcpy(pub, UNCOM_PUB_STR_ADD(key), 130);
+	pub[130] = 0;
+	SetEccPrivKey(decrypted_buf);
+#endif
+	return 0;
 }
 #endif
