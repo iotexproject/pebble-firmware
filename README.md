@@ -5,7 +5,7 @@ The firmware implements the asset tracking application using Pebble hardware des
 
 # download v1.4.0
 
-. git clone -b v1.4.0   https://github.com/iotexproject/pebble-firmware.git
+. git clone https://github.com/iotexproject/pebble-firmware.git
 
 . cd  pebble-firmware
 
