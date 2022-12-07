@@ -1,4 +1,4 @@
-[submodule "pebble-firmware"]
+[submodule "zephyr"]
 	path = zephyr
-	url = https://github.com/nrfconnect/sdk-zephyr.git
+	url = https://github.com/nrfconnect/sdk-zephyr
 	branch = v2.4.0-ncs1

@@ -7,7 +7,7 @@ The firmware is customized based on nordic nRF SDK v1.4.0. It uses cc310 hardwar
 
 ``` 
 cd ~
-git clone https://github.com/iotexproject/pebble-firmware.git  --recursive 
+git clone --recursive https://github.com/iotexproject/pebble-firmware.git
 ```
 
 ## Operations required for compilation with emStudio
