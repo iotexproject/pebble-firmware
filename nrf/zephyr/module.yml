@@ -1,6 +1,0 @@
-build:
-  cmake: .
-  kconfig: Kconfig.nrf
-  settings:
-    board_root: .
-    dts_root: .

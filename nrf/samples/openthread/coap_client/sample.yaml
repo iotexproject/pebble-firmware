@@ -1,7 +1,0 @@
-sample:
-  description: Test CoAP communication in Thread network
-  name: Openthread CoAP Client
-tests:
-  samples.openthread.coap_client:
-    tags: net openthread coap
-    platform_allow: nrf52840dk_nrf52840 nrf52833dk_nrf52833

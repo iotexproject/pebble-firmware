@@ -1,3 +1,0 @@
-header.EventHeaderProto.namespace    max_size:32
-header.EventHeaderProto.name    max_size:32
-header.EventHeaderProto.messageId    max_size:32

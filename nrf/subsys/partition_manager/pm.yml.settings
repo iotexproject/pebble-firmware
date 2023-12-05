@@ -1,5 +1,0 @@
-#include <autoconf.h>
-
-settings_storage:
-  placement: {before: [end]}
-  size: CONFIG_PM_PARTITION_SIZE_SETTINGS_STORAGE

@@ -1,4 +1,0 @@
-tests:
-  zigbee.osif.nvram:
-    platform_allow: nrf52840dk_nrf52840 nrf52833dk_nrf52833
-    tags: zigbee_nvram
